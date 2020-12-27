@@ -1,3 +1,12 @@
+import sys
+
+class ExceptionStrings:
+	empty_log = 'You tried to provide an empty log file! Please, select another file.'
+	incorrect_arg = 'An argument {} doesn\'t exist! Use help to get more info.'
+	no_arg_value = 'You didn\'t provide any value after {} argument! Use help to get more info.'
+	bad_usage = 'Bad usage! Use help to get more info.'
+	wrong_path = 'Can\'t find such file or directory. Use help to get more info.'
+
 #Обработка(анализ) входных данных из.log файла на выявление аномалий
 def analyze(path_to_file, path_to_output):
 	default_ua = ['Firefox', 'Chrome', 'Safari', 'Edge']
@@ -63,3 +72,28 @@ def get_analysis(args):
 					print(ExceptionStrings.wrong_path)
 					return
 		analyze(path_to_file, path_to_output)
+		
+# Выводит информацию об утилите 
+def get_help():
+	print('\n\tAnomalyAnalysis help you to analyze your access.log file\n')
+	print('Common usage: python3 anomalyanalysis.py [command] [args]\n\n')
+	print('Commands:\n')
+	print('"help" - shows this list\n\n')
+	print('"analyze [-p pathToFile] [-o pathToOutput]" - analyze your access.log file\n')
+	print('[-p pathToFile] - enter path to your log file (default value: /var/log/apache2/access.log)\n')
+	print('[-o pathToOutput] - enter path to result file (default value: ./)\n\n')
+ 
+ 
+def main():
+	arguments = sys.argv
+	if len(arguments) == 1 or arguments[1] == 'help':
+		get_help()
+	elif len(arguments) > 1 and arguments[1] == "analyze":
+		get_analysis(arguments)
+	else:
+		print(ExceptionStrings.bad_usage)
+	return
+ 
+ 
+if __name__ == '__main__':
+	main()
