@@ -1,1 +1,32 @@
+#Обработка(анализ) входных данных из.log файла на выявление аномалий
+def analyze(path_to_file, path_to_output):
+	default_ua = ['Firefox', 'Chrome', 'Safari', 'Edge']
+	anomaly_list = list()
+	with open(path_to_file, 'rb') as LogFile:
+		if LogFile.read().decode() == '':
+			print(ExceptionStrings.empty_log)
+		else:
+			LogFile.seek(0)
+			for line in LogFile:
+				is_anomaly = True
+				log_string = line.decode()
+				ip_string = log_string[:log_string.find(' ')]
+				time_string = ''.join(log_string.split(' ')[i] for i in range(3, 5))
+				ua_string = log_string[log_string.rfind('Mozilla'):]
+				for ua in default_ua:
+					if ua in ua_string:
+						is_anomaly = False
+						break
+				if is_anomaly:
+					anomaly_list.append(f'{ip_string + " "*(16-len(ip_string))}| {time_string[1:-6]} UTC{time_string[-6:-3]} | {ua_string}')
+
+	with open(path_to_output + 'analysisresult.txt', 'wb') as ResultFile:
+		if anomaly_list == list():
+			ResultFile.write('No detected anomalies'.encode())
+		else:
+			ResultFile.write(f'Count of detected anomalies: {len(anomaly_list)}\n\n'.encode())
+			ResultFile.write(f'{" "*7}IP{" "*21}Time\t\t\t\tUser-Agent\n'.encode())
+			for anomaly_string in anomaly_list:
+				ResultFile.write(f'{anomaly_string}\n'.encode())
+		print('Analysis\'s been finished. Check result file')
 
