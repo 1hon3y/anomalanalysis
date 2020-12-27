@@ -30,3 +30,36 @@ def analyze(path_to_file, path_to_output):
 				ResultFile.write(f'{anomaly_string}\n'.encode())
 		print('Analysis\'s been finished. Check result file')
 
+# Чтение аргументов пользователя и запуск анализа 
+def get_analysis(args):
+	path_to_file = '/var/log/apache2/access.log'
+	path_to_output = './'
+	if len(args) == 2:
+		analyze(path_to_file, path_to_output)
+	else:
+		for arg in args[2::2]:
+			if arg not in ['-p', '-o']:
+				print(ExceptionStrings.incorrect_arg.format(arg))
+				return
+			if arg == '-p':
+				try:
+					path_to_file = args[args.index(arg) + 1]
+					open(path_to_file)
+				except IndexError:
+					print(ExceptionStrings.no_arg_value.format(arg))
+					return
+				except FileNotFoundError:
+					print(ExceptionStrings.wrong_path)
+					return
+			if arg == '-o':
+				try:
+					path_to_output = args[args.index(arg) + 1]
+					file = open(path_to_output + 'analysisresult.txt', 'w')
+					file.close()
+				except IndexError:
+					print(ExceptionStrings.no_arg_value.format(arg))
+					return
+				except FileNotFoundError:
+					print(ExceptionStrings.wrong_path)
+					return
+		analyze(path_to_file, path_to_output)
